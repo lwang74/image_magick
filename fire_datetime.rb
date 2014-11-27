@@ -43,8 +43,11 @@ end
 
 #~ path="F:\\photo\\2012_01"
 # path="F:\\photo\\DCIM\\100CANON"
-in_path='D:\lwang\image_magick\photo_in'
-out_path='D:\lwang\image_magick\photo_out'
+# in_path='D:\lwang\image_magick\photo_in'
+# out_path='D:\lwang\image_magick\photo_out'
+in_path='F:\photo\201411'
+out_path='F:\photo\201411_date'
+
 Dir["#{in_path}\\*.jpg".gsub(/\\/, "\/")].each{|x|
 	# p x
 	p = Photo.new(x)
