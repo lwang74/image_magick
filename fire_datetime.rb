@@ -3,8 +3,8 @@ require 'quick_magick'
 require 'exifr'
 
 class Photo
-	@@week=%W(Mon Tue Wed Thu Fri Sat Sun)
-	@@mons=%W(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec)
+	# @@week=%W(Mon Tue Wed Thu Fri Sat Sun)
+	# @@mons=%W(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec)
 	def initialize org_img_full_name
 		@org_img_full_name=org_img_full_name
 		@img_filename=@org_img_full_name
@@ -12,20 +12,19 @@ class Photo
 			@img_filename = $1
 		end
 		@exif=EXIFR::JPEG.new(@org_img_full_name)
-		p date_time=@exif.date_time
-
-		year=''; mon=''; day=''; hour=''; min=''
-		if /^(#{@@week.join('|')})\s+(#{@@mons.join('|')})\s+(\d+)\s+(\d+):(\d+):(\d+)\s+[\+\-]\d+\s+(\d+)$/i=~date_time.to_s
-			mon=$2
-			day=$3
-			hour=$4
-			min=$5
-			year=$7
+		date_time=@exif.date_time_original #date_time
+		if !date_time #如果没有原始时间，就用修改时间。
+			date_time=@exif.date_time 
+			puts "#{org_img_full_name} !!! used NOT original date time !!!" if date_time
 		end
-		#~ p year, mon, day, hour, min
+		if !date_time #如果exifr里没有记录时间，就只能用文件的时间了。
+			f = File.new(@org_img_full_name)
+			date_time = f.mtime
+			puts "#{org_img_full_name} !!! used file time !!!"
+		end
 
-		@date_str="#{year}/#{@@mons.index(mon)+1}/#{day} #{hour.to_i}:#{min.to_i}"
-		puts @date_str
+		@date_str = date_time.strftime("%y/%m/%d %H:%M")
+		# puts @date_str
 	end
 	
 	def save_img out_path
@@ -44,10 +43,10 @@ end
 
 #~ path="F:\\photo\\2012_01"
 # path="F:\\photo\\DCIM\\100CANON"
-in_path='F:\photo\201411'
-out_path='F:\photo\201411_date'
+in_path='D:\lwang\image_magick\photo_in'
+out_path='D:\lwang\image_magick\photo_out'
 Dir["#{in_path}\\*.jpg".gsub(/\\/, "\/")].each{|x|
-	p x
+	# p x
 	p = Photo.new(x)
 	p.save_img out_path
 }
